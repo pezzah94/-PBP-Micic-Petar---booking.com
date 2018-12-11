@@ -43,3 +43,10 @@ begin
     
    
 end$
+
+-- triger pre brisanja iz tabele Korisnik
+-- sprecava se brisanje iz tabele Korisnik u slucaju sledecih situacija:
+-- 1. proverava se da li korisnik nema neizmirene dugove
+-- 2. ako ima dodatih komentara postavlja ime na null
+
+
