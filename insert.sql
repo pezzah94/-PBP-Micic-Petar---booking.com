@@ -1,3 +1,5 @@
+use mydb;
+
 insert into Korisnik values 
 (10000                              , 'Kori '                              , ' Erickson'                               ,str_to_date('11.04.1957', '%d.%m.%Y'))                             ,
 (10001                              , 'Sima '                               , ' Walls'                                 ,str_to_date('22.11.1957' , '%d.%m.%Y'))                               ,
@@ -57,66 +59,67 @@ insert into Korisnik values
 
 
 
-
+/*
 
 insert into Student values
-(1000,'ir457.65' ,'1021United General ' ,10010),
-(1001,'ir329.65 ','1022Swanlake Hanninghan' ,10011),
-(1002,'ir337.65 ','1023Northshore ' ,10012),
-(1003,'ir489.65 ','1024Spring Harbor ' ,10013),
-(1004,'ir952.157 ','Sapphire Lake Community ' ,10014),
-(1005,'ir314.157 ','Great River Community ' ,10015),
-(1006,'re115.157 ','Wildflower Community ' ,10016),
-(1007,'re411.157 ','Freeman School ' ,10017),
-(1008,'re167.157 ','Ridgeview School ' ,10018),
-(1009,'re163.96 ','Lowland ' ,10019),
-(1010,'re557.96 ','Hope Valley School ' ,10020),
-(1011,'re351.96 ','Harmony Faculty ' ,10021),
-(1012,'re562.96 ','Spring Grove Community Hospital' ,10022),
-(1013,'ft761.96 ','Grand Willow General Hospital ' ,10023),
-(1014,'ft718.96 ','Forest View Faculty ' ,10024),
-(1015,'ft805.96 ','Rainbow General Hospital ' ,10025),
-(1016,'ft445.96 ','Trinity School ' ,10026),
-(1017,'ft931.1187','Blessings Hospital School' ,10027),
-(1018,'ft769.1187','Spring Hill Faculty' ,10028),
-(1019,'ft620.1187','Harmony Faculty' ,10029);
+(10000,'ir457.65' ,'1021United General ' ,10010),
+(10001,'ir329.65 ','1022Swanlake Hanninghan' ,10011),
+(10002,'ir337.65 ','1023Northshore ' ,10012),
+(10003,'ir489.65 ','1024Spring Harbor ' ,10013),
+(10004,'ir952.157 ','Sapphire Lake Community ' ,10014),
+(10005,'ir314.157 ','Great River Community ' ,10015),
+(10006,'re115.157 ','Wildflower Community ' ,10016),
+(10007,'re411.157 ','Freeman School ' ,10017),
+(10008,'re167.157 ','Ridgeview School ' ,10018),
+(10009,'re163.96 ','Lowland ' ,10019),
+(10010,'re557.96 ','Hope Valley School ' ,10020),
+(10011,'re351.96 ','Harmony Faculty ' ,10021),
+(10012,'re562.96 ','Spring Grove Community Hospital' ,10022),
+(10013,'ft761.96 ','Grand Willow General Hospital ' ,10023),
+(10014,'ft718.96 ','Forest View Faculty ' ,10024),
+(10015,'ft805.96 ','Rainbow General Hospital ' ,10025),
+(10016,'ft445.96 ','Trinity School ' ,10026),
+(10017,'ft931.1187','Blessings Hospital School' ,10027),
+(10018,'ft769.1187','Spring Hill Faculty' ,10028),
+(10019,'ft620.1187','Harmony Faculty' ,10029);*/
 
+/*
+ insert into Zaposlen(zaposlenid,zanimanje,nazivfirme)VALUES 
+ (1,'ComputerSupportSpecialist','Icefan'),
+(2,'Economist','Flexphase'),
+(3,'Physician','Subware'),
+(4,'Speech.LanguagePathologist','Lamtone'),
+(5,'Janitor','Hayholding'),
+(6,'PatrolOfficer','Planethigh'),
+(7,'LandscapeArchitect','coneline'),
+(8,'Landscaper&Groundskeeper','Lambam'),
+(9,'RespiratoryTherapist','goldholdings'),
+(10,'WebDeveloper','gravecom'),
+(11,'Veterinarian','Kaytrans'),
+(12,'SchoolPsychologist','Vivafind'),
+(13,'Judge','Transuning'),
+(14,'RadiologicTechnologist','Lexitech'),
+(15,'Interpreter&Translator','Sancode');
 
-insert into Zaposlen(zaposlenID, zanimanje, nazivFirme, korisnikID) values 
-(1,'Computer Support Specialist' ,'Icefan' ,10030),
-(2,'Economist ' ,'Flexphase' ,10031),
-(3,'Physician ' ,'Subware' ,10032),
-(4,'Speech.Language Pathologist ' ,'Lamtone' ,10033),
-(5,'Janitor ' ,'Hayholding' ,10034),
-(6,'Patrol Officer ' ,'Planethigh' ,10035),
-(7,'Landscape Architect ' ,'coneline' ,10036),
-(8,'Landscaper & Groundskeeper ' ,'Lambam' ,10037),
-(9,'Respiratory Therapist ' ,'goldholdings',10038), 
-(10,'Web Developer ','gravecom' ,10039),
-(11,'Veterinarian ','Kaytrans' ,10040),
-(12,'School Psychologist ','Vivafind' ,10041),
-(13,'Judge ','Transuning' ,10042),
-(14,'Radiologic Technologist ','Lexitech' ,10043),
-(15,'Interpreter & Translator ','Sancode' ,10044);
 
 
   
 insert into Lice values 
-(0,10000),
-(1,10001),
-(2,10002),
-(3,10003),
-(4,10004),
-(5,10005),
-(6,10006),
-(7,10007),
-(8,10008),
-(9,10009),
-(10,10045),
-(11,10046),
-(12,10047),
-(13,10048),
-(14,10049);
+(0000),
+(0001),
+(0002),
+(0003),
+(0004),
+(0005),
+(0006),
+(0007),
+(0008),
+(0009),
+(10045),
+(10046),
+(10047),
+(10048),
+(10049);
 
 
 
@@ -529,7 +532,6 @@ insert into Iznajmljivanje(korisnikID,smestajID,datumPocetka,datumKraja,brojDana
 
 insert into
   Placanje(
-    PlacanjeID,
     korisnikID,
     smestajID,
     datumUplate,
@@ -537,36 +539,36 @@ insert into
     uplaceno
   )
 values
-  (100, 10000, 1000080, now(), 295.42, 295.42),
-  (101, 10001, 1000087, now(), 383.7, 383.7),
-  (102, 10002, 1000005, now(), 1272.69, 1272.6),
-  (103, 10003, 1000018, now(), 912.24, 912.24),
-  (104, 10004, 1000028, now(), 858.04, 858.04),
-  (105, 10005, 1000050, now(), 451.8, 451.8),
-  (106, 10006, 1000057, now(), 4299.9, 4299.9),
-  (107, 10007, 1000040, now(), 1131.1, 1131.1),
-  (108, 10008, 1000022, now(), 2947, 2947),
-  (109, 10009, 1000060, now(), 5117, 5117),
-  (110, 10010, 1000070, now(), 1141.6, 1141.6),
-  (111, 10011, 1000004, now(), 1957.7, 1957.7),
-  (112, 10012, 1000087, now(), 1918.5, 1918.5),
-  (113, 10013, 1000093, now(), 1843.9, 1843.9),
-  (114, 10014, 1000050, now(), 790.65, 790.65),
-  (115, 10015, 1000029, now(), 5624.4, 5624.4),
-  (116, 10016, 1000014, null, 2453.88, null),
-  (117, 10017, 1000097, null, 2099.64, null),
-  (118, 10018, 1000064, null, 6871.92, null),
-  (119, 10019, 1000066, null, 3223, null),
-  (120, 10020, 1000034, null, 547.64, null),
-  (121, 10021, 1000084, null, 3027.19, null),
-  (122, 10022, 1000056, null, 2342.6, null),
-  (123, 10023, 1000057, null, 7309.83, null),
-  (124, 10024, 1000091, null, 632.05, null),
-  (125, 10025, 1000030, null, 550.75, null),
-  (126, 10026, 1000073, null, 1000.55, null),
-  (127, 10027, 1000005, null, 2969.61, null),
-  (128, 10028, 1000037, null, 417.8, null),
-  (129, 10029, 1000089, null, 1032.22, null);
+  (10000, 1000080, now(), 295.42, 295.42),
+  (10001, 1000087, now(), 383.7, 383.7),
+  (10002, 1000005, now(), 1272.69, 1272.6),
+  (10003, 1000018, now(), 912.24, 912.24),
+  (10004, 1000028, now(), 858.04, 858.04),
+  (10005, 1000050, now(), 451.8, 451.8),
+  (10006, 1000057, now(), 4299.9, 4299.9),
+  (10007, 1000040, now(), 1131.1, 1131.1),
+  (10008, 1000022, now(), 2947, 2947),
+  (10009, 1000060, now(), 5117, 5117),
+  (10010, 1000070, now(), 1141.6, 1141.6),
+  (10011, 1000004, now(), 1957.7, 1957.7),
+  (10012, 1000087, now(), 1918.5, 1918.5),
+  (10013, 1000093, now(), 1843.9, 1843.9),
+  (10014, 1000050, now(), 790.65, 790.65),
+  (10015, 1000029, now(), 5624.4, 5624.4),
+  (10016, 1000014, null, 2453.88, null),
+  (10017, 1000097, null, 2099.64, null),
+  (10018, 1000064, null, 6871.92, null),
+  (10019, 1000066, null, 3223, null),
+  (10020, 1000034, null, 547.64, null),
+  (10021, 1000084, null, 3027.19, null),
+  (10022, 1000056, null, 2342.6, null),
+  (10023, 1000057, null, 7309.83, null),
+  (10024, 1000091, null, 632.05, null),
+  (10025, 1000030, null, 550.75, null),
+  (10026, 1000073, null, 1000.55, null),
+  (10027, 1000005, null, 2969.61, null),
+  (10028, 1000037, null, 417.8, null),
+  (10029, 1000089, null, 1032.22, null);
 
 
 -- upiti, i funkcionalnost aplikacije  
@@ -624,11 +626,6 @@ and not exists (select * from Iznajmljivanje i where i.smestajID=s.smestajID and
 insert into Iznajmljivanje values 
 (10000, 1000080 , date('2019-01-05'), date('2019-01-07'),  2 ,  now());
 
-
-
-
-
-
 --3. unosenje uplate korisnika , aktivira triger
 update Placanje 
 set uplaceno = <value>
@@ -650,24 +647,19 @@ insert into Zaposlen values
 insert into Lice values 
 ();
 
-
-
 --6. korisnik je zavrsio sa uslugama i izbacuje se iz tabele iznajmljivanje 
 
 delete from Iznajmljivanje
 where smestajID=<smestajid> and korisnikID=<korisnikid>
-
 
 --7. brisanje naloga korisnika 
 
 delete from Korisnik
 where korisnikID=<korisnikid>
 
-
 -- 8. login korisnika, pretraga tabele sa paswordima 
 
 -- treba da napravim bazu, i pronadjem kako se radi enkriptovanje 
-
 
 */
 
