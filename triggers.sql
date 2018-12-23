@@ -1,52 +1,103 @@
 -- trigger 1:
 -- iznajmljivanje cuva info o tekucim rezervacijama, kada se tu izbrise red onda je apartman slobodan
 -- triger pre unosa u tabelu iznajmljivanje:
---        1. Proverava se da li se za <smestaj> preklapa datum pocetka i datum kraja, i zabranjuje se unos u tom slucaju
+--   1. Proverava se da li se za <smestaj> preklapa datum pocetka i datum kraja, i zabranjuje se unos u tom slucaju
 --  [x]2. automatski se racuna broj_dana 
---  3. unosi se red u tabelu Placanje, gde se racuna ukupna cena i ako je korisnik uplatio, postavlja se datum uplate, a inace null
---  4. postavlja se status korisnika na 'active'
--- [x] 5. mora pri unosu da vazi datumPocetka < datumKraja !! 
+-- 
+-- [x] 4. postavlja se status korisnika na 'active'
+-- [x] 5. mora pri unosu da vazi datumPocetka < datumKraja  
+-- [x] 6. Racuna se ukupan iznos cenaNoci
 
-drop trigger IznajmljivanjeRestrict;
 
-use delimiter $
-create trigger IznajmljivanjeRestrict before insert on Iznajmljivanje 
+-- dodati prvo korisnika petar
+-- okida trigere
+/*
+insert into Iznajmljivanje values 
+(10050, 1000089 , date('2019-09-26'), date('2019-09-29'), 0 ,  now() ,null, 666, null);
+
+select * from Iznajmljivanje;
+select * from Korisnik;*/
+
+
+-- delete from Iznajmljivanje where KorisnikID=10050 and smestajID=1000089;
+
+use mydb;
+
+delimiter $
+
+drop trigger if exists ProveraIznajmljivanja$
+
+
+create trigger ProveraIznajmljivanja before insert on Iznajmljivanje 
 for each row 
 
 begin 
-
+	declare cena int;
+	declare ukupno int;
+	
+	 set cena = (select cenaNoci from Smestaj s where s.smestajID=new.smestajID);
+	
+	-- 1da li se preklapaju dva iznajmljivanja istog smestaja 
 	if exists(select * from Iznajmljivanje i where i.smestajID=new.smestajID and 
 				(new.datumPocetka between i.datumPocetka and i.datumKraja or 
                 new.datumKraja between i.datumPocetka and i.datumKraja))
                 then signal sqlstate '45000' set message_text = 'Greska!...';
 	end if;
     
-    
+    -- 2da li su neispravno uneti datumi 
     if(new.datumKraja < new.datumPocetka)
-        then signal sqlstate '45000' set message_text = "Greska: Neispravan unos datuma, datum zavrsetka iznajmljivanja je manji od datuma pocetka iznajmljivanja!";
+        then signal sqlstate '45000' set message_text = 'Greska: Neispravan unos datuma, datum zavrsetka iznajmljivanja je manji od datuma pocetka iznajmljivanja!';
     else set new.brojDana = datediff(new.datumKraja, new.datumPocetka);
     end if;
     
-    
+	-- 2. da li se ispravno postavi ukupan_iznos 
+	set new.ukupanIznos = cena*new.brojDana;
 	
-end
+    -- 3. postavlja se status korisnika na active 
+	update Korisnik set status='active' where korisnikID=new.korisnikID;
+	
+	
+end$
 
--- u tabelu placanje sa automatski insertuje, ona se samo azurira 
--- automatski se brise iz tabele placanje, nakon sto se izbrise iz tabele Iznajmljivanje
--- trigger 2: 
-use delimiter $
-create trigger PlacanjeRestrict before update on Placanje 
+-- tice se placanja, pre updateovanja placanja 
+-- pre unosa iznosa za uplatu, proverava se da li je ukupan iznos jednak iznosu za uplatu 
+-- '10050', '1000089', '2019-09-26', '2019-09-29', '3', '2018-12-21 18:21:27', NULL, '441', NULL
+
+-- select * from Iznajmljivanje;
+
+-- update Iznajmljivanje set uplaceno=150 where KorisnikID=10050 and SmestajID=1000089;
+
+
+drop trigger if exists ProveraPlacanja$
+
+
+
+CREATE TRIGGER ProveraPlacanja BEFORE UPDATE ON Iznajmljivanje
+FOR EACH ROW 
+BEGIN
+	declare upl int;
+    declare temp int;
+    set temp = (old.ukupanIznos < new.uplaceno);
+    set upl = (select uplaceno from Iznajmljivanje where korisnikID=new.KorisnikID and SmestajID=new.SmestajID);
+	-- provera iznosa pri vrsenju uplate 
+    
+    IF (temp=0)
+		then signal sqlstate '45000' set message_text = 'Uplacen iznos mora da odgovara ukupnom iznosu!';    
+    END IF;
+   
+	set new.datumUplate = now();
+	
+END$
+
+
+
+create trigger NakonIznajmljivanja before delete on Iznajmljivanje 
 for each row 
 begin 
-	if (old.ukupanIznos <= new.uplaceno) then signal sqlstate '45000' set message_text = 'Greska!';
-    end if;
-    
+	-- provera da li postoji u tabeli iznajmljivanje taj korisnik, ako ne postoji onda se azurira na 'not active'
+    update Korisnik set booked=booked+1 where korisnikID=korisnikID;
    
 end$
 
--- triger pre brisanja iz tabele Korisnik
--- sprecava se brisanje iz tabele Korisnik u slucaju sledecih situacija:
--- 1. proverava se da li korisnik nema neizmirene dugove
--- 2. ako ima dodatih komentara postavlja ime na null
-
+delimiter ;
 
