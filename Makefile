@@ -4,18 +4,18 @@ SRC = pbp.c
 FLAGS = -g -Wall `mysql_config --cflags --libs`
 PROGS = program
 
-.PHONY: all create insert beauty dist progs
+.PHONY: all create trigger insert beauty dist progs
 
 
-all: $(PROGRAM) create trigger insert 
+all: $(PROGRAM) create  insert trigger
 
 
 create:
 	mysql -u root -p <create.sql 
 
 trigger: 
-# 	mysql -u root -p  <triggers.sql
-# 
+	mysql -u root -p  <triggers.sql
+	
 insert:
 	mysql -u root -p <insert.sql
 
