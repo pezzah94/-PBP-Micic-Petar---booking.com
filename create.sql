@@ -285,11 +285,36 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Iznajmljivanje` (
   CONSTRAINT `fk_Korisnik_has_Smestaj_Korisnik1`
     FOREIGN KEY (`korisnikID`)
     REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_Korisnik_has_Smestaj_Smestaj1`
     FOREIGN KEY (`smestajID`)
     REFERENCES `mydb`.`Smestaj` (`smestajID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Veza`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Veza` ;
+
+CREATE TABLE IF NOT EXISTS `mydb`.`Veza` (
+  `KorisnikID` INT(11) NOT NULL,
+  `inRelKorisnikID` INT(11) NOT NULL,
+  PRIMARY KEY (`KorisnikID`, `inRelKorisnikID`),
+  INDEX `fk_Korisnik_has_Korisnik_Korisnik2_idx` (`inRelKorisnikID` ASC),
+  INDEX `fk_Korisnik_has_Korisnik_Korisnik1_idx` (`KorisnikID` ASC),
+  CONSTRAINT `fk_Korisnik_has_Korisnik_Korisnik1`
+    FOREIGN KEY (`KorisnikID`)
+    REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Korisnik_has_Korisnik_Korisnik2`
+    FOREIGN KEY (`inRelKorisnikID`)
+    REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

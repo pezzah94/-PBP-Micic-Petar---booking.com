@@ -41,7 +41,7 @@ begin
 	if exists(select * from Iznajmljivanje i where i.smestajID=new.smestajID and 
 				(new.datumPocetka between i.datumPocetka and i.datumKraja or 
                 new.datumKraja between i.datumPocetka and i.datumKraja))
-                then signal sqlstate '45000' set message_text = 'Greska!...';
+                then signal sqlstate '45000' set message_text = 'Greska!Apartman je vec iznajmljen od strane drugog korisnika.';
 	end if;
     
     -- 2da li su neispravno uneti datumi 
@@ -77,7 +77,7 @@ FOR EACH ROW
 BEGIN
 	declare upl int;
     declare temp int;
-    set temp = (old.ukupanIznos < new.uplaceno);
+    set temp = (old.ukupanIznos <= new.uplaceno);
     set upl = (select uplaceno from Iznajmljivanje where korisnikID=new.KorisnikID and SmestajID=new.SmestajID);
 	-- provera iznosa pri vrsenju uplate 
     
@@ -91,12 +91,24 @@ END$
 
 
 
-create trigger NakonIznajmljivanja before delete on Iznajmljivanje 
+create trigger NakonIznajmljivanja after delete on Iznajmljivanje 
 for each row 
 begin 
+    declare temp int;
 	-- provera da li postoji u tabeli iznajmljivanje taj korisnik, ako ne postoji onda se azurira na 'not active'
-    update Korisnik set booked=booked+1 where korisnikID=korisnikID;
+	set temp = (coalesce(old.ukupanIznos,0) <= coalesce(old.uplaceno,0));
+	-- ovde ide provera da li je ukupaniznos jednak uplacenom iznosu u tom slucaju uvecaj booked
+    if (temp=1) then
+    update Korisnik set booked=booked+1 where korisnikID=old.korisnikID;
+    end if;
    
+   -- provera ako nema vise u tabeli iznajmljivanje ti onda stavi status na not active
+   set temp = (select count(smestajID) from Iznajmljivanje where korisnikID=old.korisnikID);
+   
+   
+   IF (temp=0) THEN
+		update Korisnik set status='not active' where korisnikID=old.korisnikID;    
+    END IF;
 end$
 
 delimiter ;
