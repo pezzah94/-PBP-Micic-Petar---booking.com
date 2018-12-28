@@ -462,6 +462,8 @@ insert into Iznajmljivanje(korisnikID, smestajID, datumPocetka, datumKraja, broj
 (10028, 1000066, date('2019-03-19'), date('2019-03-21'),  2 ,  now()  ,    null, 417.8, null),
 (10029, 1000067 , date('2019-01-05'), date('2019-01-10'), 7 ,  now() ,    null, 1032.22, null);
 
+insert into Veza values (10050,10000),(10025,10011),(10030,10017);
+
 
 
 -- datum uplate se postavlja na null automatski, i onda se azurira rucno kada korisnik uplati,

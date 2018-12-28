@@ -78,14 +78,18 @@ select * from Placanje;
 -- aktivno je iznajmljivanje i tu citamo korisnika i smestaj, i
 -- okida triger
 -- 1. Mora da je uplaceno >= od ukupnog iznosa 
---   2. 
+
 update Placanje 
 set uplaceno = 1610
 where korisnikID=kkk and smestajID=1000066;
 
 
 -- nakon nekog vremena korisnik je odlucio da oceni smestaj 
-select * from OceneSmestaja;
+select k.imeKorisnika,k.korisnikID,smestajID,cistoca,lokacija,osoblje,usluge,komfort,datumOcene,komentar
+ from OceneSmestaja os
+ join Korisnik k
+	on os.KorisnikID=k.KorisnikID
+    
 
 insert into OceneSmestaja values 
 (kkk, 1000066, 8, 7, 9, 9, 9, now(), 'Everything was so perfect.');
@@ -96,10 +100,53 @@ delete from Iznajmljivanje
 where korisnikID=kkk and smestajID=1000066;
 
 
+-- za dati korisnikID ako je student 
+
+
+select k.korisnikID as Korisnik, k.imeKorisnika as Ime,
+(
+case 
+	when s.korisnikID is not null then 0 
+    when z.zaposlenID is not null then 1
+    when l.liceID is not null then 2
+end) as Tip
+from Korisnik k
+left outer join Student s
+	on k.korisnikID=s.KorisnikID
+left outer join Zaposlen z
+	on k.KorisnikID=z.zaposlenID
+left outer join Lice l
+	on l.liceID=k.korisnikID
+where k.imeKorisnika like '%Lilian%';
+
+-- za studenta 
+
+
+select * from Iznajmljivanje;
 
 
 
 
+select *
+from Smestaj s join VlasnistvoSmestaja vs
+	on vs.vlasnistvoSmestajaID=s.vlasnistvoSmestajaID
+join Lokacija l
+	on l.idLokacija=vs.LokacijaID
+join OpisVlasnistvaSmestaja ovs
+	on ovs.vlasnistvoSmestajaID=vs.vlasnistvoSmestajaID
+where  -- ovs.imaWifi=1 and ovs.noPrepayment=1 and s.imaKlimu=1 and s.imaFlatScreenTv=1 and 
+s.smestajID not in (
+select s.smestajID
+from Iznajmljivanje i
+	join Smestaj s
+on s.SmestajID = i.SmestajID
+	join VlasnistvoSmestaja vs
+on vs.VlasnistvoSmestajaID = s.VlasnistvoSmestajaID
+	join Lokacija l
+on l.idLokacija=vs.lokacijaID
+where l.drzava like '%Turkey%' and date('2019-03-22') not between i.datumPocetka and i.datumKraja
+and date('2019-03-25') not between i.datumPocetka and i.datumKraja
+)
+order by cenaNoci asc;
 
-
-
+select k.korisnikID as Korisnik, k.imeKorisnika as Ime, (case         when s.korisnikID is not null then 0     when z.zaposlenID is not null then 1     when l.liceID is not null then 'Lice' end) as Tip from Korisnik k left outer join Student s  on k.korisnikID=s.KorisnikID left outer join Zaposlen z         on k.KorisnikID=z.zaposlenID left outer join Lice l     on l.liceID=k.korisnikID where k.imeKorisnika like '%Alissa%'

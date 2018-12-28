@@ -16,7 +16,7 @@
 
 void error_fatal(char *format, ...); 
 void print_table(MYSQL_RES *result);
-int user_identification(const char *user, int *userID, int *usertype);
+void user_identification(const char *user, int *userID, int *usertype);
 void show_user_info(const char *user, int userID, int usertype);
 
 void show_for_student(const char* lokacija, int broj_osoba, const char *datum_pocetka, const char *datum_kraja);
@@ -59,24 +59,25 @@ int main()
     user_identification(user, &userID, &usertype);
    
    
-    show_user_info(user, userID, usertype);
+    //show_user_info(user, userID, usertype);
    
+    
     
     
     //ovde staviti unesi sifru korisnika -- kao login korisnika  
      
     while(!exit){
         system("clear");
+        show_user_info(user, userID, usertype);
         printf("Izaberite opciju:\n");
         //opcije
         printf("[1] - Registracija korisnika\n");//samo ako je admin radi, inace nedozvoljena operacija
 		
-        printf("[2] - Uklanjanje korisnika\n");
+        printf("[2] - Pregled i uklanjanje korisnika\n");
         printf("[3] - Pretraga i rezervacija apartmana\n");
-        printf("[4] - Otkazivanje rezervacije\n");
+        printf("[4] - Pregled, otkazivanje i azuriranje rezervacija\n");
         printf("[5] - Ocenjivanje apartmana\n");
         printf("[6] - Uplacivanje apartmana\n");
-        
         printf("[7] - Pregled najblizih objekata\n");
         printf("[8] - Izlaz iz programa\n");
          
@@ -147,7 +148,7 @@ int main()
                 
             }
              if(mysql_query(connection, query))
-                error_fatal("Case 1: %s\n", mysql_error(connection));
+                error_fatal("Greska pri unosenju korisnika: %s\n", mysql_error(connection));
              
             //mysql_free_result(result);
              
@@ -174,7 +175,7 @@ int main()
            // printf("%s", query);
              
             if(mysql_query(connection, query)) //vraca NULL ako radi
-                error_fatal("Upit 5: %s\n", mysql_error(connection));
+                error_fatal("Greska pri brisanju korisnika: %s\n", mysql_error(connection));
             else
                 printf("Korisnik je uspeno uklonjen\n");
                  
@@ -245,7 +246,7 @@ int main()
             //printf("%s", query);
 			
             if(mysql_query(connection, query))
-                error_fatal("Opcija 3: Neuspeli upit!"); 
+                error_fatal("Greska prilikom iznajmljivanja smestaja: %s\n", mysql_error(connection)); 
 			else 
 				printf("Uspesno iznajmljivanje apartmana %d", smestajid);
 			
@@ -259,7 +260,7 @@ int main()
 from Iznajmljivanje where korisnikID=%d", userID);
             
             if(mysql_query(connection, query))//vraca 1 ako je uspesno 
-                error_fatal("Opcija 3: Neuspesno iznajmljivanje\n");
+                error_fatal("Greska prilikom uplacivanja smestaja: %s\n", mysql_error(connection));
                  
             result = mysql_store_result(connection); 
              
@@ -270,7 +271,7 @@ from Iznajmljivanje where korisnikID=%d", userID);
 			
 			sprintf(query, "delete from Iznajmljivanje where korisnikID=%d and smestajID=%d", userID, smestajid);
 			if(mysql_query(connection, query))//vraca 1 ako je uspesno 
-                error_fatal("Opcija 3: Neuspesno iznajmljivanje\n");
+                error_fatal("Greska prilikom otkazivanja smestaja: %s\n", mysql_error(connection));
 			else
 				printf("Rezervacija je uspesno otkazana.\n");
 			
@@ -285,7 +286,7 @@ from Iznajmljivanje where korisnikID=%d", userID);
             on os.KorisnikID=k.KorisnikID \
             ");	
             if(mysql_query(connection, query))//vraca 1 ako je uspesno 
-                error_fatal("Opcija 3: Neuspesno iznajmljivanje\n");
+                error_fatal("Greska prilikom pregleda ocena smestaja: %s\n", mysql_error(connection));
             result = mysql_store_result(connection); 
             print_table(result); 
             
@@ -312,9 +313,11 @@ from Iznajmljivanje where korisnikID=%d", userID);
 			
              
             if(mysql_query(connection, query))
-                error_fatal("Opcija 6: Neuspesno\n");
-             
-             
+                error_fatal("Greska pri oceni smestaja: %s\n", mysql_error(connection));
+            else
+                printf("Uspesno je ocenjen smestaj!\n");
+            
+            //free(line);
             print_table(result);
              
             
@@ -330,7 +333,7 @@ from Iznajmljivanje where korisnikID=%d", userID);
 from Iznajmljivanje where korisnikID=%d", userID);
 			
 			if(mysql_query(connection, query))
-			    error_fatal("Opcija 7: Neuspesno uplacivanje racuna\n");
+			    error_fatal("Greska prilikom pregleda smestaja: %s\n", mysql_error(connection));
 			
 			result = mysql_use_result(connection);
              
@@ -346,7 +349,7 @@ from Iznajmljivanje where korisnikID=%d", userID);
 			sprintf(query, "update Iznajmljivanje set uplaceno = %d where korisnikID=%d and smestajID=%d", uplaceno, userID, smestajid);
 
             if(mysql_query(connection, query))
-                error_fatal("Opcija 7: Neuspesno uplacivanje racuna\n");
+                error_fatal("Greska prilikom uplacivanja smestaja: %s\n", mysql_error(connection));
             else 
 				printf("Uplata je uspesno izvrsena za smestaj %d", smestajid);
  
@@ -357,14 +360,14 @@ from Iznajmljivanje where korisnikID=%d", userID);
                 scanf("%s", lokacija);
                 
                 sprintf(query, "select vs.vlasnistvoSmestajaID, vs.naziv \
-from VlasnistvoSmestaja vs \
+        from VlasnistvoSmestaja vs \
 join Lokacija l \
 	on vs.LokacijaID=l.idLokacija \
 where l.drzava like '%%%s%%'", lokacija);
                 
                 
                 if(mysql_query(connection, query))
-			    error_fatal("Opcija 7: Neuspesno uplacivanje racuna\n");
+                    error_fatal("Greska prilikom pretrage smestaja: %s\n", mysql_error(connection));
 			
                 result = mysql_use_result(connection);
                 
@@ -388,7 +391,7 @@ where vs.vlasnistvoSmestajaID=%d", smestajid);
                 
                 
                 if(mysql_query(connection, query))
-                    error_fatal("Opcija 7: Neuspesno uplacivanje racuna\n");
+                    error_fatal("Greska prilikom pretrage objekata: %s\n", mysql_error(connection));
 			
                 result = mysql_use_result(connection);
                 
@@ -402,13 +405,13 @@ where vs.vlasnistvoSmestajaID=%d", smestajid);
             break;
              
             default:
-                printf("Izabrana opcija ne postoji!");
+                printf("Izabrana opcija ne postoji!\n");
         }
          
          
     }
- 
- 
+    mysql_free_result(result);
+    mysql_close(connection);
     return 0;
 }
  
@@ -431,38 +434,36 @@ void print_table(MYSQL_RES *result){
     MYSQL_FIELD* field;
     num_fields = mysql_num_fields(result);
     field = mysql_fetch_fields(result);
-    printf("|");
-    int charcount = 1;
-    for(int i=0;i<num_fields;i++){
-        printf(" %s |", field[i].name);
-        charcount += strlen(field[i].name) + 3;
-         
-    }
-    printf("\n");
-     
-     for(int i=0;i<charcount;i++){
-        printf("-");
-    }   
- 
+   // printf("|");
+   
+  /*  int numcount = mysql_num_rows(result);
+    if(numcount==0)
+    {
+        printf("Tabela je prazna.\n");return;
+    }*/
+    
     printf("\n");
      
      
         while((row=mysql_fetch_row(result))!=NULL){
-            printf("|");
+            /*printf("|");
              
             for(int i=0;i<num_fields;i++){
                 printf("[%s] ", row[i] ? row[i] : "NULL");
             }
-            printf("\n");
+            printf("\n");*/
+            printf("-----------------------------------------------------------\n");      
+                        for(int i=0; i< num_fields; i++)
+                            printf("%-30s | %s\n", field[i].name, row[i]);
         }
-             
+         printf("-----------------------------------------------------------\n");    
      
      
-        mysql_free_result(result);
+        //mysql_free_result(result);
 }
 
 
-int user_identification(const char *user, int *userID, int *usertype){
+void user_identification(const char *user, int *userID, int *usertype){
     
     // pretraga baze ako je admin sa posebnim IDjem ili korisnik sa nekim IDjem
     char query[MAX_QUERY_SIZE];
@@ -488,7 +489,7 @@ where k.imeKorisnika like '%%%s%%'", user);
     MYSQL_RES *result;
     MYSQL_ROW row;
     if(mysql_query(connection, query))
-                error_fatal("Opcija 6: Neuspesno\n");
+                error_fatal("Opcija 6: Neuspesno\n", mysql_error(connection));
         
     result = mysql_store_result(connection); 
     
@@ -501,11 +502,11 @@ where k.imeKorisnika like '%%%s%%'", user);
     *usertype = atoi(row[2]);
    // printf("[%d]", *usertype);
    
-    mysql_free_result(result);
+    //mysql_free_result(result);
 }
 
 void show_user_info(const char *user, int userID, int usertype){
-    
+    printf("\n");
     switch(usertype){
         case 0: printf("|Student");break;
         case 1: printf("|Zaposlen");break;
@@ -551,19 +552,19 @@ order by s.cenaNoci asc, ovs.imaWifi desc, ovs.noPrepayment desc, s.imaFlatScree
     
     
     MYSQL_RES *result;
-    MYSQL_ROW row;
+    //MYSQL_ROW row;
     if(mysql_query(connection, query))
                 error_fatal("Opcija 6: Neuspesno\n");
     
     result = mysql_store_result(connection);
     print_table(result);
-    mysql_free_result(result);
+   // mysql_free_result(result);
 }
 void show_for_zaposlen(const char* lokacija, int broj_osoba, const char *datum_pocetka, const char *datum_kraja){
     char query[MAX_QUERY_SIZE];
     
-     sprintf(query, "SELECT s.smestajid, \
-       brojsoba,ovs.imaWifi, \
+     sprintf(query, 
+             "select s.smestajid,brojsoba,ovs.imaWifi,   \
        tipsmestaja, \
        brojkreveta, \
        imaklimu, \
@@ -594,19 +595,19 @@ group by s.smestajID \
     
     
     MYSQL_RES *result;
-    MYSQL_ROW row;
+    
     if(mysql_query(connection, query))
                 error_fatal("Opcija 6: Neuspesno\n");
     
     result = mysql_store_result(connection);
     print_table(result);
-    mysql_free_result(result);
+   // mysql_free_result(result);
     
 }
 void show_for_lice(const char* lokacija, int broj_osoba, const char *datum_pocetka, const char *datum_kraja){
     char query[MAX_QUERY_SIZE];
     
-    sprintf(query, "SELECT s.smestajid, \
+    sprintf(query, "SELECT s.smestajid,\
        brojsoba,ovs.imaWifi, \
        tipsmestaja, \
        brojkreveta, \
@@ -637,31 +638,17 @@ group by s.smestajID \
     
     
     MYSQL_RES *result;
-    MYSQL_ROW row;
+    
     if(mysql_query(connection, query))
                 error_fatal("Opcija 6: Neuspesno\n");
     
     result = mysql_store_result(connection);
     print_table(result);
     
-    mysql_free_result(result);
+   // mysql_free_result(result);
 }
 
 
-void show_near_objects(const char *lokacija){
-    char query[MAX_QUERY_SIZE];
-    
-    //sprintf(query, "", lokacija, broj_osoba, datum_pocetka, datum_kraja);
-    
-    
-    MYSQL_RES *result;
-    MYSQL_ROW row;
-    if(mysql_query(connection, query))
-                error_fatal("Opcija 6: Neuspesno\n");
-    
-    result = mysql_store_result(connection);
-    print_table(result);
-    mysql_free_result(result);
-}
+
 
 

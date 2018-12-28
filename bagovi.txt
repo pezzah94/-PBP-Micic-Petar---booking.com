@@ -1,0 +1,20 @@
+bugs:
+    1. opcija 0 za vracanje u glavnu petlju, prekida se unos
+
+
+ 
+    5. compile iz jedne komande, ne 3 puta unosim sifru
+
+    7. lepota ispisa
+    8. pregled rezervacija, a nula za povratak
+    9. prikazuje vec iznajmljen apartman
+
+    11. smisleni unos podataka da testiram sve trigere 
+    12. srediti prikaz objekata u blizini
+    
+    14. kad se izlazi iz ocene smestaja break
+new features:
+    1. funkcija show couple suit, koja ce da preporuci apartman, stoji pored imena 
+    2. mozda da pri oceni apartmana sortiram po najvecoj prosecnoj oceni 
+
+4

@@ -8,6 +8,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- Schema mydb
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `mydb` ;
+
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
@@ -17,11 +18,15 @@ USE `mydb` ;
 -- -----------------------------------------------------
 -- Table `mydb`.`Korisnik`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Korisnik` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Korisnik` (
   `KorisnikID` INT(11) NOT NULL,
   `imeKorisnika` VARCHAR(50) NOT NULL,
   `prezimeKorisnika` VARCHAR(45) NOT NULL,
   `datumRodjenja` DATE NULL DEFAULT NULL,
+  `status` VARCHAR(45) NOT NULL,
+  `booked` INT NULL,
   PRIMARY KEY (`KorisnikID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -30,6 +35,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Lice`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Lice` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Lice` (
   `liceID` INT(11) NOT NULL,
   PRIMARY KEY (`liceID`),
@@ -46,6 +53,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Dete`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Dete` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Dete` (
   `deteID` INT(11) NOT NULL,
   `liceID` INT(11) NOT NULL,
@@ -55,7 +64,9 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Dete` (
   INDEX `fk_Dete_1_idx` (`liceID` ASC),
   CONSTRAINT `fk_Dete_1`
     FOREIGN KEY (`liceID`)
-    REFERENCES `mydb`.`Lice` (`liceID`))
+    REFERENCES `mydb`.`Lice` (`liceID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -63,6 +74,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Objekti`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Objekti` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Objekti` (
   `objektiID` INT(11) NOT NULL,
   `naziv` VARCHAR(256) NULL DEFAULT NULL,
@@ -75,6 +88,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Lokacija`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Lokacija` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Lokacija` (
   `idLokacija` INT(11) NOT NULL,
   `naziv` VARCHAR(256) NULL DEFAULT NULL,
@@ -88,6 +103,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`VlasnistvoSmestaja`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`VlasnistvoSmestaja` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`VlasnistvoSmestaja` (
   `vlasnistvoSmestajaID` INT(11) NOT NULL,
   `tipVlasnistvaSmestaja` VARCHAR(256) NULL DEFAULT NULL,
@@ -108,12 +125,13 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Distanca`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Distanca` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Distanca` (
-  `objektiID` INT(11) NOT NULL,
-  `vlasnistvoSmestajaID` INT(11) NOT NULL,
+  `objektiID` INT(11) NULL,
+  `vlasnistvoSmestajaID` INT(11) NULL,
   `opis` VARCHAR(45) NULL DEFAULT NULL,
   `km` INT(11) NULL DEFAULT NULL,
-  PRIMARY KEY (`objektiID`, `vlasnistvoSmestajaID`),
   INDEX `fk_Distanca_1_idx` (`objektiID` ASC),
   INDEX `fk_Distanca_2_idx` (`vlasnistvoSmestajaID` ASC),
   CONSTRAINT `fk_Distanca_1`
@@ -129,6 +147,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Smestaj`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Smestaj` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Smestaj` (
   `smestajID` INT(11) NOT NULL,
   `brojSoba` INT(11) NOT NULL,
@@ -139,6 +159,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Smestaj` (
   `imaBalkon` TINYINT(1) NULL DEFAULT NULL,
   `imaPrivatnoKupatilo` TINYINT(1) NULL DEFAULT NULL,
   `imaFlatScreenTv` TINYINT(1) NULL DEFAULT NULL,
+  `forCouples` TINYINT(1) NULL,
   `vlasnistvoSmestajaID` INT(11) NOT NULL,
   `cenaNoci` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`smestajID`),
@@ -153,31 +174,10 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Iznajmljivanje`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Iznajmljivanje` (
-  `korisnikID` INT(11) NOT NULL,
-  `smestajID` INT(11) NOT NULL,
-  `datumPocetka` DATE NOT NULL,
-  `datumKraja` DATE NOT NULL,
-  `brojDana` INT(11) NOT NULL,
-  `datumIznajmljivanja` DATETIME NOT NULL,
-  PRIMARY KEY (`korisnikID`, `smestajID`),
-  INDEX `korisnikID_idx` (`korisnikID` ASC),
-  INDEX `apartmanID_idx` (`smestajID` ASC),
-  CONSTRAINT `apartmanID`
-    FOREIGN KEY (`smestajID`)
-    REFERENCES `mydb`.`Smestaj` (`smestajID`),
-  CONSTRAINT `korisnikID`
-    FOREIGN KEY (`korisnikID`)
-    REFERENCES `mydb`.`Korisnik` (`KorisnikID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
 -- Table `mydb`.`OceneSmestaja`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`OceneSmestaja` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`OceneSmestaja` (
   `korisnikID` INT(11) NOT NULL,
   `smestajID` INT(11) NOT NULL,
@@ -203,6 +203,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`OpisVlasnistvaSmestaja`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`OpisVlasnistvaSmestaja` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`OpisVlasnistvaSmestaja` (
   `vlasnistvoSmestajaID` INT(11) NOT NULL,
   `imaBar` TINYINT(1) NULL DEFAULT NULL,
@@ -214,65 +216,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`OpisVlasnistvaSmestaja` (
   `ukljucenDorucak` TINYINT(1) NULL DEFAULT NULL,
   `noPrepayment` TINYINT(1) NULL DEFAULT NULL,
   `disabledGuestFascilities` TINYINT(1) NULL DEFAULT NULL,
-  INDEX `fk_OpisVlasnistvaSmestaja_VlasnistvoSmestaja1_idx` (`vlasnistvoSmestajaID` ASC),
+  PRIMARY KEY (`vlasnistvoSmestajaID`),
   CONSTRAINT `fk_OpisVlasnistvaSmestaja_VlasnistvoSmestaja1`
     FOREIGN KEY (`vlasnistvoSmestajaID`)
-    REFERENCES `mydb`.`VlasnistvoSmestaja` (`vlasnistvoSmestajaID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Placanje`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Placanje` (
-  `korisnikID` INT(11) NOT NULL,
-  `smestajID` INT(11) NOT NULL,
-  `datumUplate` DATETIME NULL DEFAULT NULL,
-  `ukupanIznos` FLOAT NULL DEFAULT NULL,
-  `uplaceno` FLOAT NULL DEFAULT NULL,
-  PRIMARY KEY (`korisnikID`, `smestajID`),
-  CONSTRAINT `fk_Placanje_Iznajmljivanje1`
-    FOREIGN KEY (`korisnikID` , `smestajID`)
-    REFERENCES `mydb`.`Iznajmljivanje` (`korisnikID` , `smestajID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Srodstvo`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Srodstvo` (
-  `VlasnistvoSmestajaID` INT(11) NOT NULL,
-  `uSrodstvuVlasnistvoSmestajaID` INT(11) NOT NULL,
-  PRIMARY KEY (`VlasnistvoSmestajaID`, `uSrodstvuVlasnistvoSmestajaID`),
-  INDEX `fk_Srodstvo_2_idx` (`uSrodstvuVlasnistvoSmestajaID` ASC),
-  CONSTRAINT `fk_Srodstvo_1`
-    FOREIGN KEY (`VlasnistvoSmestajaID`)
     REFERENCES `mydb`.`VlasnistvoSmestaja` (`vlasnistvoSmestajaID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_Srodstvo_2`
-    FOREIGN KEY (`uSrodstvuVlasnistvoSmestajaID`)
-    REFERENCES `mydb`.`VlasnistvoSmestaja` (`vlasnistvoSmestajaID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Status`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`Status` (
-  `korisnikID` INT(11) NOT NULL,
-  `status` VARCHAR(256) NULL DEFAULT NULL,
-  `booked` INT(11) NULL DEFAULT NULL,
-  PRIMARY KEY (`korisnikID`),
-  INDEX `fk_Status_Korisnik1_idx` (`korisnikID` ASC),
-  CONSTRAINT `fk_Status_Korisnik1`
-    FOREIGN KEY (`korisnikID`)
-    REFERENCES `mydb`.`Korisnik` (`KorisnikID`))
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -280,6 +229,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Student`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Student` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Student` (
   `KorisnikID` INT(11) NOT NULL,
   `indeks` VARCHAR(15) NULL DEFAULT NULL,
@@ -298,6 +249,8 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mydb`.`Zaposlen`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Zaposlen` ;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Zaposlen` (
   `zaposlenID` INT(11) NOT NULL,
   `zanimanje` VARCHAR(256) NULL DEFAULT NULL,
@@ -308,6 +261,62 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Zaposlen` (
     REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Iznajmljivanje`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Iznajmljivanje` ;
+
+CREATE TABLE IF NOT EXISTS `mydb`.`Iznajmljivanje` (
+  `korisnikID` INT(11) NULL,
+  `smestajID` INT(11) NULL,
+  `datumPocetka` DATE NULL,
+  `datumKraja` DATE NULL,
+  `brojDana` INT NULL,
+  `vremeIznajmljivanja` DATETIME NULL,
+  `datumUplate` DATETIME NULL,
+  `ukupanIznos` INT NULL,
+  `uplaceno` INT NULL,
+  INDEX `fk_Korisnik_has_Smestaj_Smestaj1_idx` (`smestajID` ASC),
+  INDEX `fk_Korisnik_has_Smestaj_Korisnik1_idx` (`korisnikID` ASC),
+  CONSTRAINT `fk_Korisnik_has_Smestaj_Korisnik1`
+    FOREIGN KEY (`korisnikID`)
+    REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Korisnik_has_Smestaj_Smestaj1`
+    FOREIGN KEY (`smestajID`)
+    REFERENCES `mydb`.`Smestaj` (`smestajID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Veza`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `mydb`.`Veza` ;
+
+CREATE TABLE IF NOT EXISTS `mydb`.`Veza` (
+  `KorisnikID` INT(11) NOT NULL,
+  `inRelKorisnikID` INT(11) NOT NULL,
+  PRIMARY KEY (`KorisnikID`, `inRelKorisnikID`),
+  INDEX `fk_Korisnik_has_Korisnik_Korisnik2_idx` (`inRelKorisnikID` ASC),
+  INDEX `fk_Korisnik_has_Korisnik_Korisnik1_idx` (`KorisnikID` ASC),
+  CONSTRAINT `fk_Korisnik_has_Korisnik_Korisnik1`
+    FOREIGN KEY (`KorisnikID`)
+    REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Korisnik_has_Korisnik_Korisnik2`
+    FOREIGN KEY (`inRelKorisnikID`)
+    REFERENCES `mydb`.`Korisnik` (`KorisnikID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
