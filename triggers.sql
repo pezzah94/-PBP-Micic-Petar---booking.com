@@ -32,7 +32,7 @@ create trigger ProveraIznajmljivanja before insert on Iznajmljivanje
 for each row 
 
 begin 
-	declare cena int;
+	declare cena double;
 	declare ukupno int;
 	
 	 set cena = (select cenaNoci from Smestaj s where s.smestajID=new.smestajID);
@@ -41,7 +41,7 @@ begin
 	if exists(select * from Iznajmljivanje i where i.smestajID=new.smestajID and 
 				(new.datumPocetka between i.datumPocetka and i.datumKraja or 
                 new.datumKraja between i.datumPocetka and i.datumKraja))
-                then signal sqlstate '45000' set message_text = 'Greska!Apartman je vec iznajmljen od strane drugog korisnika.';
+                then signal sqlstate '45000' set message_text = 'Greska!Apartman je vec iznajmljen.';
 	end if;
     
     -- 2da li su neispravno uneti datumi 
