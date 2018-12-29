@@ -181,18 +181,20 @@ DROP TABLE IF EXISTS `mydb`.`OceneSmestaja` ;
 CREATE TABLE IF NOT EXISTS `mydb`.`OceneSmestaja` (
   `korisnikID` INT(11) NOT NULL,
   `smestajID` INT(11) NOT NULL,
-  `cistoca` INT(11) NOT NULL,
-  `lokacija` INT(11) NOT NULL DEFAULT '0',
-  `osoblje` INT(11) NOT NULL,
-  `usluge` INT(11) NOT NULL,
-  `komfort` INT(11) NOT NULL,
+  `cistoca` INT(11) NOT NULL DEFAULT 0,
+  `lokacija` INT(11) NOT NULL DEFAULT 0,
+  `osoblje` INT(11) NOT NULL DEFAULT 0,
+  `usluge` INT(11) NOT NULL DEFAULT 0,
+  `komfort` INT(11) NOT NULL DEFAULT 0,
   `datumOcene` DATETIME NOT NULL,
   `komentar` VARCHAR(800) NULL DEFAULT 'no comment',
   PRIMARY KEY (`korisnikID`, `smestajID`),
   INDEX `SmestajFK_idx` (`smestajID` ASC),
   CONSTRAINT `SmestajFK`
     FOREIGN KEY (`smestajID`)
-    REFERENCES `mydb`.`Smestaj` (`smestajID`),
+    REFERENCES `mydb`.`Smestaj` (`smestajID`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
   CONSTRAINT `fk_OceneSmestaja_1`
     FOREIGN KEY (`korisnikID`)
     REFERENCES `mydb`.`Korisnik` (`KorisnikID`))
